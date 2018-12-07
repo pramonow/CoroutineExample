@@ -10,13 +10,25 @@ import android.widget.Button
 import android.widget.Toast
 import kotlinx.coroutines.*
 
-class MainActivity : AppCompatActivity(),View.OnClickListener {
+class MainActivity : AppCompatActivity() {
 
     lateinit var buttonOne:Button
+    lateinit var buttonTwo:Button
+    lateinit var buttonThree:Button
 
-    override fun onClick(p0: View?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        toast()
+        buttonOne = findViewById<Button>(R.id.button_one)
+        buttonOne.setOnClickListener { v -> simpleCoroutine() }
+
+        buttonTwo = findViewById<Button>(R.id.button_two)
+        buttonTwo.setOnClickListener { v -> coroutineDeferAndModifyUI() }
+
+        buttonThree = findViewById<Button>(R.id.button_three)
+        buttonThree.setOnClickListener { v -> testJob() }
+
     }
 
     fun simpleCoroutine(){
@@ -24,66 +36,62 @@ class MainActivity : AppCompatActivity(),View.OnClickListener {
 
         // Start a coroutine
         GlobalScope.launch {
-            delay(500)
-            Log.d("CoroutineExample","global scope launch")
+            suspendFunction()
+            //delay(500)
+            //Log.d("CoroutineExample","global scope launch")
         }
         Log.d("CoroutineExample","Finish")
+
+        //Start
+        //Finish
+        //Global Scope launch
     }
 
-    fun toast(){
+    fun coroutineDeferAndModifyUI(){
         Log.d("CoroutineExample","Start")
 
         val deferred = GlobalScope.async { delay(1000)
             "Message here" }
 
-
-        GlobalScope.launch {
+        GlobalScope.launch(Dispatchers.Main) {
             val sum = deferred.await()
-            //async(UI){
-                Toast.makeText(this@MainActivity,"Abc",Toast.LENGTH_SHORT).show()
-            //}
+            Toast.makeText(this@MainActivity,"Abc",Toast.LENGTH_SHORT).show()
         }
 
         Log.d("CoroutineExample","Finish")
+
+        //Start
+        //Finish
+        //Toast comes out after delay
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+    fun testJob(){
+        Log.d("CoroutineExample","Start")
 
-        buttonOne = findViewById<Button>(R.id.test_button)
+        val job = GlobalScope.launch { // launch new coroutine and keep a reference to its Job
+            Log.d("CoroutineExample","Start Coroutine")
+            delay(1000L)
+            Log.d("CoroutineExample","Finish Coroutine")
+        }
 
-        buttonOne.setOnClickListener(this)
+        GlobalScope.launch {
 
+            Log.d("CoroutineExample","Before Job")
+            job.join()
+            Log.d("CoroutineExample","After Job")
+        }
+
+        //Start
+        //Start Coroutine
+        //Before Job
+        //Finish Coroutine
+        //After Job
     }
 
-   /* private fun startUpdate() {
-        //resetRun()
-
-        greenJob = launch(Android) {
-            startRunning(progressBarGreen)
-        }
-
-        redJob = launch(Android) {
-            startRunning(progressBarRed)
-        }
-
-        blueJob =launch(Android) {
-            startRunning(progressBarBlue)
-        }
+    suspend fun suspendFunction()
+    {
+        delay(500)
+        Log.d("CoroutineExample","global scope launch")
     }
 
-    private suspend fun startRunning(
-            progressBar: RoundCornerProgressBar) {
-        progressBar.progress = 0f
-        while (progressBar.progress < 1000 && !raceEnd) {
-            delay(10)
-            progressBar.progress += (1..10).random()
-        }
-        if (!raceEnd) {
-            raceEnd = true
-            Toast.makeText(this, "${progressBar.tooltipText} won!",
-                    Toast.LENGTH_SHORT).show()
-        }
-    }*/
 }
