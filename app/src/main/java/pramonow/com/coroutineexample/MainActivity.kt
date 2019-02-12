@@ -92,6 +92,7 @@ class MainActivity : AppCompatActivity() {
          */
     }
 
+    //suspend is special keyword for function to be called inside coroutines
     suspend fun suspendFunction() {
         delay(500)
         Log.d("CoroutineExample","global scope launch")
