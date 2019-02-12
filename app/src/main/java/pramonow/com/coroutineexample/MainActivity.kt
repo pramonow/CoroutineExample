@@ -2,10 +2,7 @@ package pramonow.com.coroutineexample
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.Contacts
-import android.provider.Settings
 import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import kotlinx.coroutines.*
@@ -20,15 +17,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        buttonOne = findViewById<Button>(R.id.button_one)
-        buttonOne.setOnClickListener { v -> simpleCoroutine() }
+        buttonOne = findViewById(R.id.button_one)
+        buttonOne.setOnClickListener { simpleCoroutine() }
 
-        buttonTwo = findViewById<Button>(R.id.button_two)
-        buttonTwo.setOnClickListener { v -> coroutineDeferAndModifyUI() }
+        buttonTwo = findViewById(R.id.button_two)
+        buttonTwo.setOnClickListener { testJob() }
 
-        buttonThree = findViewById<Button>(R.id.button_three)
-        buttonThree.setOnClickListener { v -> testJob() }
-
+        buttonThree = findViewById(R.id.button_three)
+        buttonThree.setOnClickListener { coroutineDeferAndModifyUI() }
     }
 
     fun simpleCoroutine(){
@@ -37,59 +33,66 @@ class MainActivity : AppCompatActivity() {
         // Start a coroutine
         GlobalScope.launch {
             suspendFunction()
-            //delay(500)
-            //Log.d("CoroutineExample","global scope launch")
         }
         Log.d("CoroutineExample","Finish")
 
-        //Start
-        //Finish
-        //Global Scope launch
+        /*
+        WILL PRINT IN SEQUENCE:
+        - Start
+        - Finish
+        - Global Scope launch
+        */
     }
 
     fun coroutineDeferAndModifyUI(){
         Log.d("CoroutineExample","Start")
 
         val deferred = GlobalScope.async { delay(1000)
-            "Message here" }
+            "Waiting for me" }
 
         GlobalScope.launch(Dispatchers.Main) {
-            val sum = deferred.await()
-            Toast.makeText(this@MainActivity,"Abc",Toast.LENGTH_SHORT).show()
+            //it will wait until the deferred task finish
+            val msg = deferred.await()
+            Toast.makeText(this@MainActivity,msg,Toast.LENGTH_SHORT).show()
         }
 
         Log.d("CoroutineExample","Finish")
 
-        //Start
-        //Finish
-        //Toast comes out after delay
+        /*
+            ACTION IN SEQUENCE
+            - Log Start
+            - Log Finish
+            - Toast comes out after delay
+         */
     }
 
     fun testJob(){
+
         Log.d("CoroutineExample","Start")
 
         val job = GlobalScope.launch { // launch new coroutine and keep a reference to its Job
-            Log.d("CoroutineExample","Start Coroutine")
+            Log.d("CoroutineExample","Doing a job")
             delay(1000L)
-            Log.d("CoroutineExample","Finish Coroutine")
+            Log.d("CoroutineExample","Finish Job")
         }
 
         GlobalScope.launch {
-
-            Log.d("CoroutineExample","Before Job")
+            Log.d("CoroutineExample","Before Job finish")
             job.join()
-            Log.d("CoroutineExample","After Job")
+            Log.d("CoroutineExample","After Job finish")
         }
 
-        //Start
-        //Start Coroutine
-        //Before Job
-        //Finish Coroutine
-        //After Job
+        /*
+            WILL PRINT IN SEQUENCE:
+            - Start
+            - Doing a Job
+            - Before Job finish
+            - Finish Job
+            - After Job finish
+         */
     }
 
-    suspend fun suspendFunction()
-    {
+    suspend fun suspendFunction() {
         delay(500)
         Log.d("CoroutineExample","global scope launch")
     }

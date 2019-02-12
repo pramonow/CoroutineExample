@@ -11,20 +11,20 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:id="@+id/button_one"
-        android:text="Button 1"/>
+        android:text="Example 1: Simple Coroutine"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:id="@+id/button_two"
-        android:text="Button 2"/>
+        android:text="Example 2: Job combining"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:id="@+id/button_three"
-        android:text="Button 3"/>
+        android:text="Example 3: UI Thread"/>
 
 </LinearLayout>
